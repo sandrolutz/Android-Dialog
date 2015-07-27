@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="dialog_max_width_center">350dp</dimen>
+    <dimen name="dialog_max_width_bottom">450dp</dimen>
+    <dimen name="dialog_min_margin">16dp</dimen>
+</resources>
