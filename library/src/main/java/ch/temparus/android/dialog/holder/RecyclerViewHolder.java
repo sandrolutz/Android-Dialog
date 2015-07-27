@@ -7,11 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.*;
 import android.widget.FrameLayout;
 import ch.temparus.android.advancedrecyclerview.AdvancedRecyclerView;
+import ch.temparus.android.advancedrecyclerview.BaseAdapter;
 import ch.temparus.android.dialog.Dialog;
 import ch.temparus.android.dialog.R;
 import ch.temparus.android.dialog.listeners.OnHolderListener;
 import ch.temparus.android.dialog.listeners.OnStateChangeListener;
-import ch.temparus.components.advancedrecyclerview.BaseAdapter;
 
 /**
  * RecyclerViewHolder holds a {@link AdvancedRecyclerView} as the content view of the {@link ch.temparus.android.dialog.Dialog}.

@@ -17,7 +17,7 @@ Features included:
 gradle:
 
 ```groovy
-compile 'ch.temparus.android:dialog:1.0.0'
+compile 'ch.temparus.android:dialog:1.0.1'
 ```
 
 Maven:
@@ -25,7 +25,7 @@ Maven:
 <dependency>
   <groupId>ch.temparus.android</groupId>
   <artifactId>dialog</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <type>aar</type>
 </dependency>
 ```

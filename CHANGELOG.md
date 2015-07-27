@@ -1,4 +1,10 @@
 Change Log
 ==========
 
+## [1.0.1](https://github.com/sandrolutz/Android-Dialog/tree/1.0.1) (2015-07-27)
+
+**Bugfixes:**
+
+- Updated AdvancedRecyclerView library to version 1.0.2. Version 1.0.1 on maven central is broken and can't be used.
+
 ## [1.0.0](https://github.com/sandrolutz/Android-Dialog/tree/1.0.0) (2015-07-27)
