@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Dialog</string>
+
+    <string name="show_dialog">Show dialog</string>
+    <string name="gravity">Gravity</string>
+    <string name="center">Center</string>
+    <string name="bottom">Bottom</string>
+    <string name="type">Content-Holder-Type</string>
+    <string name="list_view_holder">ListViewHolder</string>
+    <string name="recycler_view_holder">RecyclerViewHolder</string>
+    <string name="view_holder">ViewHolder</string>
+    <string name="header">I am a header!</string>
+    <string name="footer">I am a footer!</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="dialog_layout" type="id"/>
+    <item name="dialog_top_view" type="id"/>
+    <item name="dialog_bottom_view" type="id"/>
+    <item name="dialog_content_container" type="id"/>
+    <item name="dialog_content_view" type="id"/>
+    <item name="header_container" type="id"/>
+    <item name="footer_container" type="id"/>
+</resources>
