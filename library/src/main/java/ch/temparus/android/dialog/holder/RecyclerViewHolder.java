@@ -206,6 +206,7 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
             @Override
             public void onCollapsed(Dialog dialog) {
                 mState = Dialog.State.COLLAPSED;
+                mRecyclerView.scrollToPosition(0);
             }
         };
     }

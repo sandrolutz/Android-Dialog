@@ -40,6 +40,7 @@ class DialogLayout extends LinearLayout {
     private View mBottomView;
     private View mHeaderView;
     private View mFooterView;
+    private ViewGroup mHeaderContainer;
     private ViewGroup mFooterContainer;
     private BoundedFrameLayout mContentContainer;
     private int mCollapsedHeight;
@@ -303,6 +304,7 @@ class DialogLayout extends LinearLayout {
             if (mIsFooterAlwaysVisible) {
                 mFooterContainer.setTranslationY(mFooterContainer.getTranslationY() + deltaY);
             }
+            setState(mSettlingState);
         } else {
             int duration = 300;
             mScroller.startScroll(getScrollX(), getScrollY(), 0, deltaY, duration);
@@ -387,6 +389,7 @@ class DialogLayout extends LinearLayout {
         getHolderView().setPadding(mPadding[0], mPadding[1], mPadding[2], mPadding[3]);
 
         mContentContainer.addView(contentView);
+        mHeaderContainer = (ViewGroup) mContentContainer.findViewById(R.id.header_container);
         mFooterContainer = (ViewGroup) mContentContainer.findViewById(R.id.footer_container);
     }
 
@@ -530,10 +533,17 @@ class DialogLayout extends LinearLayout {
         final int action = motionEvent.getAction() & MotionEventCompat.ACTION_MASK;
 
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-            if (mSettlingState == Dialog.State.EXPANDED) {
-                expand();
-            } else {
-                collapse();
+            if (mState == Dialog.State.DRAGGING) {
+
+                setState(Dialog.State.SETTLING);
+
+                if (mLastMotionDeltaY < 0) {
+                    expand();
+                } else {
+                    collapse();
+                }
+
+                mActivePointerId = INVALID;
             }
             return false;
         }
@@ -653,6 +663,8 @@ class DialogLayout extends LinearLayout {
                     performDrag(position, motionEvent);
                 }
                 break;
+            case MotionEvent.ACTION_CANCEL:
+                // use fall through effect...
             case MotionEvent.ACTION_UP:
                 if (mState == Dialog.State.DRAGGING) {
 
@@ -664,16 +676,6 @@ class DialogLayout extends LinearLayout {
                         collapse();
                     }
 
-                    mActivePointerId = INVALID;
-                }
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                if (mState == Dialog.State.DRAGGING) {
-                    if (mSettlingState == Dialog.State.EXPANDED) {
-                        expand();
-                    } else {
-                        collapse();
-                    }
                     mActivePointerId = INVALID;
                 }
                 break;
@@ -781,11 +783,11 @@ class DialogLayout extends LinearLayout {
         int verticalMargin = mMargin[1] + mMargin[3]; // mMargin[1] == marginTop & mMargin[3] == marginBottom
         View contentView = mHolder.getInflatedView();
 
-        mHeaderView.measure(widthMeasureSpec, unspecified);
-        mFooterView.measure(widthMeasureSpec, unspecified);
-        contentView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height - mHeaderView.getMeasuredHeight() - mFooterView.getMeasuredHeight() - verticalMargin, MeasureSpec.AT_MOST));
+        mHeaderContainer.measure(widthMeasureSpec, unspecified);
+        mFooterContainer.measure(widthMeasureSpec, unspecified);
+        contentView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height - mHeaderContainer.getMeasuredHeight() - mFooterContainer.getMeasuredHeight() - verticalMargin, MeasureSpec.AT_MOST));
 
-        int finalHeight = mHeaderView.getMeasuredHeight() + contentView.getMeasuredHeight() + mFooterView.getMeasuredHeight() + verticalMargin;
+        int finalHeight = mHeaderContainer.getMeasuredHeight() + contentView.getMeasuredHeight() + mFooterContainer.getMeasuredHeight() + verticalMargin;
 
         if (finalHeight < height) {
             mContentContainer.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(finalHeight, MeasureSpec.EXACTLY));
@@ -797,7 +799,7 @@ class DialogLayout extends LinearLayout {
                 mBottomView.measure(widthMeasureSpec, helperHeightMeasureSpec);
             }
         } else {
-            contentView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height - mHeaderView.getMeasuredHeight() - mFooterView.getMeasuredHeight(), MeasureSpec.EXACTLY));
+            contentView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height - mHeaderContainer.getMeasuredHeight() - mFooterContainer.getMeasuredHeight(), MeasureSpec.EXACTLY));
         }
     }
 

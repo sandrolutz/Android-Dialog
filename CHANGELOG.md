@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.0.1) (2015-07-28)
+
+**Bugfixes:**
+
+- Fix crash when using the dialog without header and/or footer view.
+
 ## [1.0.1](https://github.com/sandrolutz/Android-Dialog/tree/1.0.1) (2015-07-27)
 
 **Bugfixes:**

@@ -134,6 +134,7 @@ public class ListViewHolder implements HolderAdapter<BaseAdapter>, AdapterView.O
             @Override
             public void onCollapsed(Dialog dialog) {
                 mState = Dialog.State.COLLAPSED;
+                mListView.smoothScrollToPosition(0);
             }
         };
     }
