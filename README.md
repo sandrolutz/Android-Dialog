@@ -37,7 +37,8 @@ You can create a new Dialog with ```Dialog.Builder```.
 Example:
 ```java
 Dialog dialog = new Dialog.Builder()
-                    .setContentHolder(new ListViewHolder(adapter));
+                    .setContentHolder(new ListViewHolder(adapter))
+                    .setGravity(Dialog.Gravity.BOTTOM)
                     .setHeader(R.layout.header)
                     .setFooter(R.layout.footer)
                     .setOnCancelListener(onCancelListener)
