@@ -1,7 +1,13 @@
 Change Log
 ==========
 
-## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.0.1) (2015-07-28)
+## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
+
+**Bugfixes:**
+
+- Fix issue when expanding a material sheet dialog occasionally getting dismissed.
+
+## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.1.0) (2015-07-28)
 
 **Bugfixes:**
 

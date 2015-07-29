@@ -350,7 +350,7 @@ class DialogLayout extends LinearLayout {
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN && v != mContentContainer) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN && mState != Dialog.State.DRAGGING && v != mContentContainer) {
                     if (mOnCancelListener != null) {
                         mOnCancelListener.onCancel(mDialog);
                     }
@@ -497,20 +497,16 @@ class DialogLayout extends LinearLayout {
     }
 
     private void setState(Dialog.State state) {
-        if (this.mState == Dialog.State.EXPANDED || this.mState == Dialog.State.COLLAPSED) {
-            mSettlingState = this.mState;
+        if (state == mState) {
+            return;
         }
-        this.mState = state;
+        if (mState == Dialog.State.EXPANDED || mState == Dialog.State.COLLAPSED) {
+            mSettlingState = mState;
+        }
+        mState = state;
 
         if (mOnStateChangeListener != null) {
-            switch (state) {
-                case EXPANDED:
-                    mOnStateChangeListener.onExpanded(mDialog);
-                    break;
-                case COLLAPSED:
-                    mOnStateChangeListener.onCollapsed(mDialog);
-                    break;
-            }
+            mOnStateChangeListener.onStateChanged(mDialog, mState);
         }
     }
 
@@ -534,7 +530,6 @@ class DialogLayout extends LinearLayout {
 
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             if (mState == Dialog.State.DRAGGING) {
-
                 setState(Dialog.State.SETTLING);
 
                 if (mLastMotionDeltaY < 0) {

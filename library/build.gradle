@@ -18,7 +18,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:recyclerview-v7:22.2.1'
     compile 'ch.temparus.android:advancedrecyclerview:1.0.2'
 }
 

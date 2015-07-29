@@ -29,17 +29,19 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
     private OnHolderListener mHolderListener;
     private View.OnKeyListener mKeyListener;
     private Dialog.State mState;
+    private long mLastStateChange;
     private int mBackgroundColorResource;
     private boolean mIsInterceptTouchEventDisallowed = false;
 
     @SuppressWarnings("unused")
     public RecyclerViewHolder() {
-
+        mLastStateChange = System.currentTimeMillis();
     }
 
     public RecyclerViewHolder(RecyclerView.LayoutManager layoutManager, BaseAdapter adapter) {
         mLayoutManager = layoutManager;
         mAdapter = adapter;
+        mLastStateChange = System.currentTimeMillis();
     }
 
     @Override
@@ -101,12 +103,14 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
         final GestureDetectorCompat gestureDetector = new GestureDetectorCompat(mRecyclerView.getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                View view = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
-                if (view != null) {
-                    int position = mRecyclerView.getChildAdapterPosition(view);
-                    int contentPosition = position - mAdapter.getHeaderCount();
-                    if (contentPosition >= 0 && mHolderListener != null) {
-                        mHolderListener.onItemClick(mAdapter.getContentItem(contentPosition), view, position);
+                if (System.currentTimeMillis() - mLastStateChange > 20) {
+                    View view = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if (view != null) {
+                        int position = mRecyclerView.getChildAdapterPosition(view);
+                        int contentPosition = position - mAdapter.getHeaderCount();
+                        if (contentPosition >= 0 && mHolderListener != null) {
+                            mHolderListener.onItemClick(mAdapter.getContentItem(contentPosition), view, position);
+                        }
                     }
                 }
                 return super.onSingleTapUp(e);
@@ -199,14 +203,12 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
     public OnStateChangeListener getOnStateChangeListener() {
         return new OnStateChangeListener() {
             @Override
-            public void onExpanded(Dialog dialog) {
-                mState = Dialog.State.EXPANDED;
-            }
-
-            @Override
-            public void onCollapsed(Dialog dialog) {
-                mState = Dialog.State.COLLAPSED;
-                mRecyclerView.scrollToPosition(0);
+            public void onStateChanged(Dialog dialog, Dialog.State state) {
+                mState = state;
+                mLastStateChange = System.currentTimeMillis();
+                if (state == Dialog.State.COLLAPSED) {
+                    mRecyclerView.scrollToPosition(0);
+                }
             }
         };
     }

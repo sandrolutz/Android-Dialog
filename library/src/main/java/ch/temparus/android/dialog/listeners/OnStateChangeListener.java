@@ -10,15 +10,10 @@ import ch.temparus.android.dialog.Dialog;
 public interface OnStateChangeListener {
 
     /**
-     * Called when dialog has reached expanded state.
+     * Called when dialog's state has changed.
      * @param dialog dialog instance
+     * @param state new state
      */
-    void onExpanded(Dialog dialog);
-
-    /**
-     * Called when dialog has reached collapsed state.
-     * @param dialog dialog instance
-     */
-    void onCollapsed(Dialog dialog);
+    void onStateChanged(Dialog dialog, Dialog.State state);
 
 }

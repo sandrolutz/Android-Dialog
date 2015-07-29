@@ -23,15 +23,17 @@ public class ListViewHolder implements HolderAdapter<BaseAdapter>, AdapterView.O
     private OnHolderListener mHolderListener;
     private View.OnKeyListener mKeyListener;
     private Dialog.State mState;
+    private long mLastStateChange;
     private int mBackgroundColorResource;
     private boolean mIsInterceptTouchEventDisallowed = false;
 
     public ListViewHolder() {
-
+        mLastStateChange = System.currentTimeMillis();
     }
 
     public ListViewHolder(BaseAdapter adapter) {
         mAdapter = adapter;
+        mLastStateChange = System.currentTimeMillis();
     }
 
     @Override
@@ -127,20 +129,20 @@ public class ListViewHolder implements HolderAdapter<BaseAdapter>, AdapterView.O
     public OnStateChangeListener getOnStateChangeListener() {
         return new OnStateChangeListener() {
             @Override
-            public void onExpanded(Dialog dialog) {
-                mState = Dialog.State.EXPANDED;
-            }
-
-            @Override
-            public void onCollapsed(Dialog dialog) {
-                mState = Dialog.State.COLLAPSED;
-                mListView.smoothScrollToPosition(0);
+            public void onStateChanged(Dialog dialog, Dialog.State state) {
+                mState = state;
+                mLastStateChange = System.currentTimeMillis();
+                if (state == Dialog.State.COLLAPSED) {
+                    mListView.smoothScrollToPosition(0);
+                }
             }
         };
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        mHolderListener.onItemClick(parent.getItemAtPosition(position), view, position);
+        if (System.currentTimeMillis() - mLastStateChange > 20) {
+            mHolderListener.onItemClick(parent.getItemAtPosition(position), view, position);
+        }
     }
 }
