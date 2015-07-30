@@ -97,7 +97,7 @@ class DialogLayout extends LinearLayout {
         mOnCancelListener = builder.onCancelListener;
         mOnStateChangeListener = mHolder.getOnStateChangeListener();
 
-        int minimumMargin = res.getDimensionPixelSize(R.dimen.dialog_min_margin);
+        int minimumMargin = res.getDimensionPixelSize(R.dimen.t_dialog__min_margin);
         for (int i = 0; i < mMargin.length; i++) {
             mMargin[i] = getMargin(mGravity, builder.margin[i], minimumMargin);
         }
@@ -110,10 +110,10 @@ class DialogLayout extends LinearLayout {
         // set maximum dialog width depending on gravity
         switch (mGravity) {
             case BOTTOM:
-                mContentContainer.setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.dialog_max_width_bottom));
+                mContentContainer.setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.t_dialog__max_width_bottom));
                 break;
             case CENTER:
-                mContentContainer.setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.dialog_max_width_center));
+                mContentContainer.setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.t_dialog__max_width_center));
                 break;
         }
         mContentContainer.setBoundedHeight(builder.maxHeight); // if INVALID, it will be ignored
@@ -123,19 +123,19 @@ class DialogLayout extends LinearLayout {
         initCancelable();
 
         if (mHeaderView == null && builder.title != null && builder.title.length() > 0) {
-            mHeaderView = LayoutInflater.from(builder.context).inflate(R.layout.dialog_header, mHeaderContainer, false);
-            ((TextView) mHeaderView.findViewById(R.id.dialog_title)).setText(builder.title);
+            mHeaderView = LayoutInflater.from(builder.context).inflate(R.layout.t_dialog__header, mHeaderContainer, false);
+            ((TextView) mHeaderView.findViewById(R.id.t_dialog__title)).setText(builder.title);
             mHolder.addHeader(mHeaderView);
         }
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setGravity(Gravity.CENTER_HORIZONTAL);
         setOrientation(VERTICAL);
-        setId(R.id.dialog_layout);
+        setId(R.id.t_dialog__layout);
 
-        mTopView.setId(R.id.dialog_top_view);
-        mBottomView.setId(R.id.dialog_bottom_view);
-        mContentContainer.setId(R.id.dialog_content_container);
+        mTopView.setId(R.id.t_dialog__top_view);
+        mBottomView.setId(R.id.t_dialog__bottom_view);
+        mContentContainer.setId(R.id.t_dialog__content_container);
 
         addView(mTopView, helperLayoutParams);
         addView(mContentContainer, contentLayoutParams);
@@ -322,9 +322,9 @@ class DialogLayout extends LinearLayout {
     private int getInAnimation(Dialog.Gravity gravity) {
         switch (gravity) {
             case BOTTOM:
-                return R.animator.bottom_slide_in;
+                return R.animator.t_dialog__bottom_slide_in;
             case CENTER:
-                return R.animator.center_fade_in;
+                return R.animator.t_dialog__center_fade_in;
             default:
                 return INVALID;
         }
@@ -333,9 +333,9 @@ class DialogLayout extends LinearLayout {
     private int getOutAnimation(Dialog.Gravity gravity) {
         switch (gravity) {
             case BOTTOM:
-                return R.animator.bottom_slide_out;
+                return R.animator.t_dialog__bottom_slide_out;
             case CENTER:
-                return R.animator.center_fade_out;
+                return R.animator.t_dialog__center_fade_out;
             default:
                 return INVALID;
         }
@@ -392,8 +392,8 @@ class DialogLayout extends LinearLayout {
         getHolderView().setPadding(mPadding[0], mPadding[1], mPadding[2], mPadding[3]);
 
         mContentContainer.addView(contentView);
-        mHeaderContainer = (ViewGroup) mContentContainer.findViewById(R.id.header_container);
-        mFooterContainer = (ViewGroup) mContentContainer.findViewById(R.id.footer_container);
+        mHeaderContainer = (ViewGroup) mContentContainer.findViewById(R.id.t_dialog__header_container);
+        mFooterContainer = (ViewGroup) mContentContainer.findViewById(R.id.t_dialog__footer_container);
     }
 
     /**

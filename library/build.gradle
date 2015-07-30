@@ -4,6 +4,8 @@ android {
     compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
     buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
 
+    resourcePrefix 't_dialog__'
+
     defaultConfig {
         minSdkVersion 12
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)

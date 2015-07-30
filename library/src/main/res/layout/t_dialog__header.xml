@@ -4,11 +4,11 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <TextView
-            android:id="@+id/dialog_title"
+            android:id="@+id/t_dialog__title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:textSize="@dimen/header_text_size"
+            android:textSize="@dimen/t_dialog__header_text_size"
             android:padding="16dp"
             android:gravity="center_vertical"
             android:drawablePadding="16dp"/>

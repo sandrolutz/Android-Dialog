@@ -5,25 +5,24 @@
         android:layout_height="wrap_content">
 
     <FrameLayout
-            android:id="@id/header_container"
+            android:id="@id/t_dialog__header_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"/>
 
-    <ListView
-            android:id="@+id/list"
+    <FrameLayout
+            android:id="@+id/view_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/footer_container"
-            android:layout_below="@id/header_container"
+            android:layout_above="@id/t_dialog__footer_container"
+            android:layout_below="@id/t_dialog__header_container"
             android:focusableInTouchMode="true"
-            android:focusable="true"
-            android:divider="@null"
-            android:dividerHeight="0dp"/>
+            android:focusable="true"/>
 
     <FrameLayout
-            android:id="@id/footer_container"
+            android:id="@id/t_dialog__footer_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_alignParentBottom="true"/>
 </RelativeLayout>

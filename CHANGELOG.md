@@ -7,6 +7,7 @@ Change Log
 
 - Add default header layout for displaying a title. 
 - Add method to Builder to add a title resource/CharSequence to display with the provided layout.
+- Add prefix ```t_dialog__``` to all resource ids to make them unique.
 
 **Bugfixes:**
 

@@ -93,9 +93,9 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
     @Override
     public View getView(LayoutInflater inflater, ViewGroup parent) {
         int backgroundColor = parent.getResources().getColor(mBackgroundColorResource);
-        View view = inflater.inflate(R.layout.holder_recycler_view, parent, false);
-        view.setId(R.id.dialog_content_view);
-        mRecyclerView = (AdvancedRecyclerView) view.findViewById(R.id.recycler_view);
+        View view = inflater.inflate(R.layout.t_dialog__holder_recycler_view, parent, false);
+        view.setId(R.id.t_dialog__content_view);
+        mRecyclerView = (AdvancedRecyclerView) view.findViewById(R.id.t_dialog__holder_recycler_view);
         mRecyclerView.setBackgroundColor(backgroundColor);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -160,7 +160,7 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
                 return mKeyListener.onKey(v, keyCode, event);
             }
         });
-        mHeaderContainer = (FrameLayout) view.findViewById(R.id.header_container);
+        mHeaderContainer = (FrameLayout) view.findViewById(R.id.t_dialog__header_container);
         mHeaderContainer.setBackgroundColor(backgroundColor);
         mHeaderContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -168,7 +168,7 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
                 return true;
             }
         });
-        mFooterContainer = (FrameLayout) view.findViewById(R.id.footer_container);
+        mFooterContainer = (FrameLayout) view.findViewById(R.id.t_dialog__footer_container);
         mFooterContainer.setBackgroundColor(backgroundColor);
         mFooterContainer.setOnTouchListener(new View.OnTouchListener() {
             @Override

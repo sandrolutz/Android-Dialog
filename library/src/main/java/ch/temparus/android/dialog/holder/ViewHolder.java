@@ -61,8 +61,8 @@ public class ViewHolder implements Holder {
 
     @Override
     public View getView(LayoutInflater inflater, ViewGroup parent) {
-        View view = inflater.inflate(R.layout.holder_view, parent, false);
-        view.setId(R.id.dialog_content_view);
+        View view = inflater.inflate(R.layout.t_dialog__holder_view, parent, false);
+        view.setId(R.id.t_dialog__content_view);
         int backgroundColor = parent.getResources().getColor(mBackgroundColor);
         ViewGroup contentContainer = (ViewGroup) view.findViewById(R.id.view_container);
         contentContainer.setBackgroundColor(backgroundColor);
@@ -77,9 +77,9 @@ public class ViewHolder implements Holder {
             }
         });
         addContent(inflater, parent, contentContainer);
-        mHeaderContainer = (ViewGroup) view.findViewById(R.id.header_container);
+        mHeaderContainer = (ViewGroup) view.findViewById(R.id.t_dialog__header_container);
         mHeaderContainer.setBackgroundColor(backgroundColor);
-        mFooterContainer = (ViewGroup) view.findViewById(R.id.footer_container);
+        mFooterContainer = (ViewGroup) view.findViewById(R.id.t_dialog__footer_container);
         mFooterContainer.setBackgroundColor(backgroundColor);
         return view;
     }

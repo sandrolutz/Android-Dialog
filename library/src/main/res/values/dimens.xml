@@ -1,6 +1,6 @@
 <resources>
-    <dimen name="dialog_max_width_center">350dp</dimen>
-    <dimen name="dialog_max_width_bottom">450dp</dimen>
-    <dimen name="dialog_min_margin">16dp</dimen>
-    <dimen name="header_text_size">22sp</dimen>
+    <dimen name="t_dialog__max_width_center">350dp</dimen>
+    <dimen name="t_dialog__max_width_bottom">450dp</dimen>
+    <dimen name="t_dialog__min_margin">16dp</dimen>
+    <dimen name="t_dialog__header_text_size">22sp</dimen>
 </resources>
