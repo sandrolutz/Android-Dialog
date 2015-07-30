@@ -53,7 +53,7 @@ If this wasn't enough, you can grab the ```sample``` from the sample directory o
 
 ## Change Log
 
-See [here](https://github.com/sandrolutz/Android-Dialog/blob/master/CHANGELOG.md).
+See [here](https://github.com/sandrolutz/Android-Dialog/blob/develop/CHANGELOG.md).
 
 ## License
 
