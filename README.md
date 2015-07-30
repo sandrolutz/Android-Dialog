@@ -2,6 +2,7 @@ Dialog for Android
 ==================
 
 This library for Android provides a Dialog including material sheet dialogs.
+
 **Minimum SDK** is **12** (Android 3.1.x Honeycomb).
 
 Features included:
@@ -48,6 +49,12 @@ Dialog dialog = new Dialog.Builder()
 
 You can display the dialog with ```dialog.show()```.
 If this wasn't enough, you can grab the ```sample``` from the sample directory of this repository.
+
+## Development
+
+You can find a verion in development state in the develop branch of this repository. It may contain more bugfixes and extended functionality.
+
+**Attention!** This version is still in development, may be unstable and should not be used in production!
 
 ## Change Log
 
