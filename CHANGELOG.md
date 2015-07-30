@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-## 1.2.0 [SNAPSHOT] (2015-07-30)
+## 1.2.0 SNAPSHOT (2015-07-30)
 
 **Enhancements:**
 
