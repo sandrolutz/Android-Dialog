@@ -4,6 +4,8 @@ Dialog for Android
 This library for Android provides a Dialog including material sheet dialogs.
 **Minimum SDK** is **12** (Android 3.1.x Honeycomb).
 
+Please note that this version is not production ready!
+
 Features included:
 - Two Gravity options: BOTTOM (as material sheet dialog) or CENTER
 - Custom header and footer views
@@ -17,7 +19,7 @@ Features included:
 gradle:
 
 ```groovy
-compile 'ch.temparus.android:dialog:1.1.1'
+compile 'ch.temparus.android:dialog:1.2.0-SNAPSHOT'
 ```
 
 Maven:
@@ -25,7 +27,7 @@ Maven:
 <dependency>
   <groupId>ch.temparus.android</groupId>
   <artifactId>dialog</artifactId>
-  <version>1.1.1</version>
+  <version>1.2.0-SNAPSHOT</version>
   <type>aar</type>
 </dependency>
 ```

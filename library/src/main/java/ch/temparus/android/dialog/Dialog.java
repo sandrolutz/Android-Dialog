@@ -1,10 +1,7 @@
 package ch.temparus.android.dialog;
 
 import android.content.Context;
-import android.support.annotation.AnimRes;
-import android.support.annotation.ColorRes;
-import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
+import android.support.annotation.*;
 import android.view.LayoutInflater;
 import android.view.View;
 import ch.temparus.android.dialog.holder.Holder;
@@ -94,6 +91,7 @@ public class Dialog {
         protected Holder holder;
         protected View footerView;
         protected View headerView;
+        protected CharSequence title;
         protected Gravity gravity = Gravity.BOTTOM;
         protected int maxWidth = INVALID;
         protected int maxHeight = INVALID;
@@ -154,6 +152,24 @@ public class Dialog {
         @SuppressWarnings("unused")
         public Builder setHeader(View view) {
             this.headerView = view;
+            return this;
+        }
+
+        /**
+         * Set title to display in the header container using the default layout provided by this library.
+         */
+        @SuppressWarnings("unused")
+        public Builder setTitle(@StringRes int resId) {
+            this.title = context.getString(resId);
+            return this;
+        }
+
+        /**
+         * Set title to display in the header container using the default layout provided by this library.
+         */
+        @SuppressWarnings("unused")
+        public Builder setTitle(CharSequence title) {
+            this.title = title;
             return this;
         }
 

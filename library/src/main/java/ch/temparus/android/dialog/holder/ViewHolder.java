@@ -63,8 +63,9 @@ public class ViewHolder implements Holder {
     public View getView(LayoutInflater inflater, ViewGroup parent) {
         View view = inflater.inflate(R.layout.holder_view, parent, false);
         view.setId(R.id.dialog_content_view);
+        int backgroundColor = parent.getResources().getColor(mBackgroundColor);
         ViewGroup contentContainer = (ViewGroup) view.findViewById(R.id.view_container);
-        contentContainer.setBackgroundColor(parent.getResources().getColor(mBackgroundColor));
+        contentContainer.setBackgroundColor(backgroundColor);
         contentContainer.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent
@@ -77,7 +78,9 @@ public class ViewHolder implements Holder {
         });
         addContent(inflater, parent, contentContainer);
         mHeaderContainer = (ViewGroup) view.findViewById(R.id.header_container);
+        mHeaderContainer.setBackgroundColor(backgroundColor);
         mFooterContainer = (ViewGroup) view.findViewById(R.id.footer_container);
+        mFooterContainer.setBackgroundColor(backgroundColor);
         return view;
     }
 

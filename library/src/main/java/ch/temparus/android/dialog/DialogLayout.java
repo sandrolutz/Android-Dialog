@@ -11,10 +11,7 @@ import android.support.v4.view.ViewConfigurationCompat;
 import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.Scroller;
+import android.widget.*;
 import ch.temparus.android.dialog.holder.Holder;
 import ch.temparus.android.dialog.holder.HolderAdapter;
 import ch.temparus.android.dialog.holder.ListViewHolder;
@@ -124,6 +121,12 @@ class DialogLayout extends LinearLayout {
         initContentView();
         initPosition();
         initCancelable();
+
+        if (mHeaderView == null && builder.title != null && builder.title.length() > 0) {
+            mHeaderView = LayoutInflater.from(builder.context).inflate(R.layout.dialog_header, mHeaderContainer, false);
+            ((TextView) mHeaderView.findViewById(R.id.dialog_title)).setText(builder.title);
+            mHolder.addHeader(mHeaderView);
+        }
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setGravity(Gravity.CENTER_HORIZONTAL);

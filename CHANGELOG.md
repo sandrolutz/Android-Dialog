@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+## 1.2.0 [SNAPSHOT] (2015-07-30)
+
+**Enhancements:**
+
+- Add default header layout for displaying a title. 
+- Add method to Builder to add a title resource/CharSequence to display with the provided layout.
+
+**Bugfixes:**
+
+- Fix issue with background color of header/footer of ViewHolder.
+
 ## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
 
 **Bugfixes:**
