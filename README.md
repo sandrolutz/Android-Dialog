@@ -7,7 +7,7 @@ This library for Android provides a Dialog including material sheet dialogs.
 Please note that this version is not production ready!
 
 Features included:
-- Two Gravity options: BOTTOM (as material sheet dialog) or CENTER
+- Gravity options: BOTTOM (as material sheet dialog), CENTER (as standard dialog) and FULLSCREEN.
 - Custom header and footer views
 - Sticky footer (footer is always visible)
 - Supports different content views.
