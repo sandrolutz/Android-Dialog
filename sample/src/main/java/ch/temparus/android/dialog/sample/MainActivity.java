@@ -38,15 +38,19 @@ public class MainActivity extends AppCompatActivity {
                 Dialog.Builder builder = new Dialog.Builder(MainActivity.this)
                                             .setOnCancelListener(new OnCancelListener() {
                                                 @Override
-                                                public void onCancel(Dialog dialog) {
+                                                public boolean onCancel(Dialog dialog) {
                                                     Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                                                    return true;
                                                 }
                                             })
+                                            .setTitle("Test-Title")
                                             .setHeader(R.layout.header)
                                             .setFooter(R.layout.footer);
 
                 if (gravityGroup.getCheckedRadioButtonId() == R.id.gravity_center) {
                     builder.setGravity(Dialog.Gravity.CENTER);
+                } else if (gravityGroup.getCheckedRadioButtonId() == R.id.gravity_fullscreen) {
+                    builder.setGravity(Dialog.Gravity.FULLSCREEN);
                 } else {
                     builder.setGravity(Dialog.Gravity.BOTTOM);
                 }
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (typeButtonId == R.id.type_list) {
                     builder.setContentHolder(new ListViewHolder(new SampleListAdapter(MainActivity.this)));
+                    builder.setCollapsedHeight(getResources().getDimensionPixelSize(R.dimen.dialog_collapsed_height));
                     builder.setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(Dialog dialog, Object item, View view, int position) {
@@ -87,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Dialog dialog = builder.create();
-                dialog.show();
+                dialog.show(getSupportFragmentManager(), "dialog");
             }
         });
     }

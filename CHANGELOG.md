@@ -1,13 +1,15 @@
 Change Log
 ==========
 
-## 1.2.0 SNAPSHOT (2015-07-30)
+## 1.2.0 SNAPSHOT (2015-08-02)
 
 **Enhancements:**
 
 - Add default header layout for displaying a title. 
 - Add method to Builder to add a title resource/CharSequence to display with the provided layout.
 - Add prefix ```t_dialog__``` to all resource ids to make them unique.
+- Add ```FULLSCREEN``` dialog as option beside of ```CENTER``` and ```BOTTOM```. 
+- Implement DialogFragment for internal use so the statusbar gets dimmed too.
 
 **Bugfixes:**
 

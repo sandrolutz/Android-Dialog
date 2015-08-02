@@ -37,6 +37,10 @@
                          android:layout_width="match_parent"
                          android:layout_height="wrap_content"
                          android:text="@string/bottom"/>
+            <RadioButton android:id="@+id/gravity_fullscreen"
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:text="@string/fullscreen"/>
         </RadioGroup>
 
         <TextView android:layout_width="match_parent"

@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/t_dialog__action_confirm"
+          app:showAsAction="always"
+          android:icon="@drawable/t_dialog__confirm"
+          android:title="@string/save"/>
+</menu>

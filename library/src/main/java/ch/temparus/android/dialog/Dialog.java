@@ -1,15 +1,16 @@
 package ch.temparus.android.dialog;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.*;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import ch.temparus.android.dialog.holder.Holder;
-import ch.temparus.android.dialog.listeners.OnCancelListener;
-import ch.temparus.android.dialog.listeners.OnClickListener;
-import ch.temparus.android.dialog.listeners.OnDismissListener;
-import ch.temparus.android.dialog.listeners.OnItemClickListener;
+import ch.temparus.android.dialog.listeners.*;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -17,23 +18,80 @@ import java.util.Arrays;
  *
  * @author Sandro Lutz
  */
-public class Dialog {
-
+public class Dialog extends android.support.v4.app.DialogFragment {
     public enum State {DRAGGING, SETTLING, COLLAPSED, EXPANDED}
+
+    private static final String BUILDER = "builder";
 
     // Determine whether the resources are set or not
     private static final int INVALID = -1;
-    private DialogLayout mRootView;
+    private Layout mRootLayout;
+    private boolean mFirst;
 
-    private Dialog(Builder builder) {
-        mRootView = new DialogLayout(this, builder);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Builder builder = (Builder) getArguments().getSerializable(BUILDER);
+        if (builder == null) {
+            throw new NullPointerException("Dialog.Builder may not be null. You should not create an instance of this fragment on your own!");
+        }
+        int themeResource = R.style.t_dialog__Theme;
+        if (builder.gravity != Gravity.FULLSCREEN) {
+            themeResource = (builder.isBackgroundDimEnabled) ? R.style.t_dialog__Theme_Dialog_BackgroundDim : R.style.t_dialog__Theme_Dialog;
+        }
+        setStyle(STYLE_NO_TITLE, themeResource);
+        mFirst = true;
     }
 
-    /**
-     * It adds the dialog view into the decorView of activity
-     */
-    public void show() {
-        mRootView.show();
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Builder builder = (Builder) getArguments().getSerializable(BUILDER);
+        builder.context = getActivity();
+        View view;
+        if (builder.gravity == Gravity.FULLSCREEN) {
+            FullscreenDialogLayout layout = new FullscreenDialogLayout(this, builder);
+            view = layout;
+            mRootLayout = layout;
+        } else {
+            DialogLayout layout = new DialogLayout(this, builder);
+            view = layout;
+            mRootLayout = layout;
+        }
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onStart();
+        if (mFirst) {
+            mRootLayout.show();
+            mFirst = false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public View findViewById(@IdRes int id) {
+        return ((ViewGroup) mRootLayout).findViewById(id);
+    }
+
+    @SuppressWarnings("unused")
+    public View getHeaderView() {
+        return mRootLayout.getHeaderView();
+    }
+
+    @SuppressWarnings("unused")
+    public View getFooterView() {
+        return mRootLayout.getFooterView();
+    }
+
+    @SuppressWarnings("unused")
+    public View getHolderView() {
+        return mRootLayout.getHolderView();
+    }
+
+    @SuppressWarnings("unused")
+    public View getDialogView() {
+        return mRootLayout.getDialogView();
     }
 
     /**
@@ -43,47 +101,30 @@ public class Dialog {
      */
     @SuppressWarnings("unused")
     public boolean isShowing() {
-        return mRootView.isShowing();
+        return isVisible() && !mFirst;
     }
 
     /**
      * It is called when to dismiss the dialog, either by calling dismiss() method or with cancellable
      */
+    @Override
     public void dismiss() {
-        mRootView.dismiss();
+        mRootLayout.dismiss();
     }
 
-    @SuppressWarnings("unused")
-    public View findViewById(@IdRes int resId) {
-        return mRootView.getDialogView().findViewById(resId);
-    }
-
-    @SuppressWarnings("unused")
-    public View getHeaderView() {
-        return mRootView.getHeaderView();
-    }
-
-    @SuppressWarnings("unused")
-    public View getFooterView() {
-        return mRootView.getFooterView();
-    }
-
-    @SuppressWarnings("unused")
-    public View getHolderView() {
-        return mRootView.getHolderView();
+    void dismissInternal() {
+        super.dismiss();
     }
 
     /**
      * Custom values for gravity
      */
-    public enum Gravity {
-        BOTTOM, CENTER
-    }
+    public enum Gravity { BOTTOM, CENTER, FULLSCREEN }
 
     /**
      * Use this builder to create a dialog
      */
-    public static final class Builder {
+    public static final class Builder implements Serializable {
         protected final int[] margin = new int[4];
         protected final int[] padding = new int[4];
 
@@ -100,6 +141,7 @@ public class Dialog {
         protected OnClickListener onClickListener;
         protected OnDismissListener onDismissListener;
         protected OnCancelListener onCancelListener;
+        protected OnConfirmListener onConfirmListener;
 
         protected boolean isFooterAlwaysVisible = true;
         protected boolean isBackgroundDimEnabled = true;
@@ -335,11 +377,37 @@ public class Dialog {
             return this;
         }
 
+        @SuppressWarnings("unused")
+        public Builder setOnConfirmListener(OnConfirmListener listener) {
+            this.onConfirmListener = listener;
+            return this;
+        }
+
         /**
          * Create the dialog using this builder
          */
         public Dialog create() {
-            return new Dialog(this);
+            Bundle arguments = new Bundle(1);
+            arguments.putSerializable(BUILDER, this);
+            Dialog dialog = new Dialog();
+            dialog.setArguments(arguments);
+            return dialog;
+        }
+
+        private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+            out.defaultWriteObject();
+            for (int i = 0; i < 4; ++i) {
+                out.writeInt(margin[i]);
+                out.writeInt(padding[i]);
+            }
+        }
+
+        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            for (int i = 0; i < 4; ++i) {
+                margin[i] = in.readInt();
+                padding[i] = in.readInt();
+            }
         }
     }
 }

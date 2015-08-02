@@ -6,12 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import ch.temparus.android.dialog.listeners.OnStateChangeListener;
 
+import java.io.Serializable;
+
 /**
  * Interface for holding the content view of {@link ch.temparus.android.dialog.Dialog}
  *
  * @author Sandro Lutz
  */
-public interface Holder {
+public interface Holder extends Serializable {
 
     /**
      * Add header view (displayed on top of the content)
@@ -39,13 +41,6 @@ public interface Holder {
      * @return content view of the {@link ch.temparus.android.dialog.Dialog}
      */
     View getView(LayoutInflater inflater, ViewGroup parent);
-
-    /**
-     * Set OnKeyListener.
-     * Called by {@link ch.temparus.android.dialog.DialogLayout} to catch key events for the back button.
-     * @param keyListener OnKeyListener
-     */
-    void setOnKeyListener(View.OnKeyListener keyListener);
 
     /**
      * Get inflated view without header / footer containers.

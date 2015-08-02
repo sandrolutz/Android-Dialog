@@ -11,4 +11,5 @@
     <string name="view_holder">ViewHolder</string>
     <string name="header">I am a header!</string>
     <string name="footer">I am a footer!</string>
+    <string name="fullscreen">Fullscreen</string>
 </resources>

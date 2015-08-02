@@ -2,6 +2,8 @@ package ch.temparus.android.dialog.listeners;
 
 import android.view.View;
 
+import java.io.Serializable;
+
 /**
  * Interface for listening to click event on items in implementations of {@link ch.temparus.android.dialog.holder.HolderAdapter}.
  *
@@ -9,7 +11,7 @@ import android.view.View;
  *
  * @author Sandro Lutz
  */
-public interface OnHolderListener {
+public interface OnHolderListener extends Serializable {
 
     /**
      * Called when a click event occurred on an item of the {@link ch.temparus.android.dialog.holder.HolderAdapter}.

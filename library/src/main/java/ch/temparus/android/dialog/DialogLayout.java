@@ -1,10 +1,9 @@
 package ch.temparus.android.dialog;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
@@ -24,13 +23,11 @@ import ch.temparus.android.dialog.listeners.*;
  * @author Sandro Lutz
  */
 @SuppressLint("ViewConstructor")
-class DialogLayout extends LinearLayout {
+class DialogLayout extends LinearLayout implements Layout {
 
     // Determine whether the resources are set or not
     private static final int INVALID = -1;
-    private static final int DIM_COLOR = 0x60000000;
 
-    private final ViewGroup mDecorView; // activity root view
     private final int[] mMargin = new int[4];
     private final int[] mPadding = new int[4];
     private View mTopView;
@@ -48,7 +45,6 @@ class DialogLayout extends LinearLayout {
     private Holder mHolder; // Content
     private boolean mIsFooterAlwaysVisible;
     private boolean mIsCancelable;
-    private boolean mIsShowing;
     private Dialog.State mState = Dialog.State.SETTLING;
     private Dialog.State mSettlingState = mState;
     private boolean mIsDismissing;
@@ -67,7 +63,7 @@ class DialogLayout extends LinearLayout {
     private Scroller mScroller; // calculates smooth scroll animation
 
     DialogLayout(Dialog dialog, Dialog.Builder builder) {
-        super(builder.context);
+        super(dialog.getActivity());
 
         final Resources res = getResources();
 
@@ -102,7 +98,6 @@ class DialogLayout extends LinearLayout {
             mMargin[i] = getMargin(mGravity, builder.margin[i], minimumMargin);
         }
 
-        mDecorView = (ViewGroup) ((Activity) getContext()).getWindow().getDecorView().findViewById(android.R.id.content);
         mTopView = new View(builder.context);
         mContentContainer = new BoundedFrameLayout(builder.context);
         mBottomView = new View(builder.context);
@@ -132,6 +127,8 @@ class DialogLayout extends LinearLayout {
         setGravity(Gravity.CENTER_HORIZONTAL);
         setOrientation(VERTICAL);
         setId(R.id.t_dialog__layout);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
 
         mTopView.setId(R.id.t_dialog__top_view);
         mBottomView.setId(R.id.t_dialog__bottom_view);
@@ -140,45 +137,6 @@ class DialogLayout extends LinearLayout {
         addView(mTopView, helperLayoutParams);
         addView(mContentContainer, contentLayoutParams);
         addView(mBottomView, helperLayoutParams);
-
-        if (builder.isBackgroundDimEnabled) {
-            setBackgroundColor(DIM_COLOR);
-        }
-
-        mHolder.setOnKeyListener(new OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (isShowing()) {
-                    switch (event.getAction()) {
-                        case KeyEvent.ACTION_UP:
-                            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                                if (mIsCancelable) {
-                                    onBackPressed();
-                                }
-                                return true;
-                            }
-                            break;
-                    }
-                }
-                return false;
-            }
-        });
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            this.addOnAttachStateChangeListener(new OnAttachStateChangeListener() {
-                @Override
-                public void onViewAttachedToWindow(View view) {
-                    if (view == DialogLayout.this) {
-                        mIsShowing = true;
-                    }
-                }
-
-                @Override
-                public void onViewDetachedFromWindow(View view) {
-                    mIsShowing = false;
-                }
-            });
-        }
 
         final ViewConfiguration configuration = ViewConfiguration.get(getContext());
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
@@ -193,17 +151,18 @@ class DialogLayout extends LinearLayout {
         if (isShowing()) {
             return;
         }
-        mDecorView.addView(this);
+
         if (mCollapsedHeight != INVALID) {
             collapseInternal(true);
         } else {
             expandInternal(true);
         }
-        Context context = getContext();
-        Animation inAnim = AnimationUtils.loadAnimation(context, this.mInAnimation);
-        mContentContainer.startAnimation(inAnim);
-
-        mContentContainer.requestFocus();
+        if (mInAnimation != INVALID) {
+            Context context = getContext();
+            Animation inAnim = AnimationUtils.loadAnimation(context, mInAnimation);
+            mContentContainer.startAnimation(inAnim);
+        }
+        requestFocus();
     }
 
     /**
@@ -212,10 +171,7 @@ class DialogLayout extends LinearLayout {
      * @return true if the dialog is visible
      */
     public boolean isShowing() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return this.isAttachedToWindow();
-        }
-        return mIsShowing;
+        return mDialog.isShowing();
     }
 
     /**
@@ -225,35 +181,42 @@ class DialogLayout extends LinearLayout {
         if (mIsDismissing) {
             return;
         }
-        Context context = mDecorView.getContext();
-        Animation outAnim = AnimationUtils.loadAnimation(context, this.mOutAnimation);
-        outAnim.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        if (mOutAnimation != INVALID) {
+            Context context = getContext();
+            Animation outAnim = AnimationUtils.loadAnimation(context, mOutAnimation);
+            outAnim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-            }
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mDecorView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mDecorView.removeView(DialogLayout.this);
-                        mIsDismissing = false;
-                        if (mOnDismissListener != null) {
-                            mOnDismissListener.onDismiss(mDialog);
-                        }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mIsDismissing = false;
+                    if (mOnDismissListener != null) {
+                        mOnDismissListener.onDismiss(mDialog);
                     }
-                });
-            }
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDialog.dismissInternal();
+                        }
+                    });
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
+                @Override
+                public void onAnimationRepeat(Animation animation) {
 
+                }
+            });
+            mContentContainer.startAnimation(outAnim);
+            mIsDismissing = true;
+        } else {
+            if (mOnDismissListener != null) {
+                mOnDismissListener.onDismiss(mDialog);
             }
-        });
-        mContentContainer.startAnimation(outAnim);
-        mIsDismissing = true;
+            mDialog.dismissInternal();
+        }
     }
 
     public View getHeaderView() {
@@ -270,6 +233,12 @@ class DialogLayout extends LinearLayout {
 
     public View getDialogView() {
         return mContentContainer;
+    }
+
+    public void cancel() {
+        if (mOnCancelListener == null || mOnCancelListener.onCancel(mDialog)) {
+            dismiss();
+        }
     }
 
     public void expand() {
@@ -311,8 +280,8 @@ class DialogLayout extends LinearLayout {
         } else {
             int duration = 300;
             mScroller.startScroll(getScrollX(), getScrollY(), 0, deltaY, duration);
+            ViewCompat.postInvalidateOnAnimation(this);
         }
-        ViewCompat.postInvalidateOnAnimation(this);
     }
 
     private void abortAnimation() {
@@ -322,9 +291,9 @@ class DialogLayout extends LinearLayout {
     private int getInAnimation(Dialog.Gravity gravity) {
         switch (gravity) {
             case BOTTOM:
-                return R.animator.t_dialog__bottom_slide_in;
+                return R.anim.t_dialog__bottom_slide_in;
             case CENTER:
-                return R.animator.t_dialog__center_fade_in;
+                return R.anim.t_dialog__center_fade_in;
             default:
                 return INVALID;
         }
@@ -333,9 +302,9 @@ class DialogLayout extends LinearLayout {
     private int getOutAnimation(Dialog.Gravity gravity) {
         switch (gravity) {
             case BOTTOM:
-                return R.animator.t_dialog__bottom_slide_out;
+                return R.anim.t_dialog__bottom_slide_out;
             case CENTER:
-                return R.animator.t_dialog__center_fade_out;
+                return R.anim.t_dialog__center_fade_out;
             default:
                 return INVALID;
         }
@@ -354,10 +323,7 @@ class DialogLayout extends LinearLayout {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN && mState != Dialog.State.DRAGGING && v != mContentContainer) {
-                    if (mOnCancelListener != null) {
-                        mOnCancelListener.onCancel(mDialog);
-                    }
-                    dismiss();
+                    cancel();
                     return true;
                 }
                 return false;
@@ -511,16 +477,6 @@ class DialogLayout extends LinearLayout {
         if (mOnStateChangeListener != null) {
             mOnStateChangeListener.onStateChanged(mDialog, mState);
         }
-    }
-
-    /**
-     * Dismiss the dialog when the user press the back button
-     */
-    public void onBackPressed() {
-        if (mOnCancelListener != null) {
-            mOnCancelListener.onCancel(mDialog);
-        }
-        dismiss();
     }
 
     @Override
@@ -815,5 +771,14 @@ class DialogLayout extends LinearLayout {
                 expandInternal(true);
             }
         }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+            cancel();
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 }

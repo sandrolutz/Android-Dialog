@@ -1,0 +1,23 @@
+<resources>
+    <!-- Base theme -->
+    <style name="t_dialog__BaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <!-- default theme -->
+    <style name="t_dialog__Theme" parent="t_dialog__BaseTheme"/>
+
+    <!-- center dialog -->
+    <style name="t_dialog__Theme.Dialog" parent="t_dialog__Theme">
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+    </style>
+    <style name="t_dialog__Theme.Dialog.BackgroundDim" parent="t_dialog__Theme.Dialog">
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+</resources>
