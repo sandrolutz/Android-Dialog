@@ -109,8 +109,6 @@ class FullscreenDialogLayout extends LinearLayout implements Layout {
         setGravity(Gravity.CENTER_HORIZONTAL);
         setOrientation(VERTICAL);
         setId(R.id.t_dialog__layout);
-        setFocusable(true);
-        setFocusableInTouchMode(true);
     }
 
     /**
@@ -125,7 +123,6 @@ class FullscreenDialogLayout extends LinearLayout implements Layout {
             Animation inAnim = AnimationUtils.loadAnimation(context, mInAnimation);
             startAnimation(inAnim);
         }
-        requestFocus();
     }
 
     /**

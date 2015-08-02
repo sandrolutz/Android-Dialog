@@ -127,8 +127,6 @@ class DialogLayout extends LinearLayout implements Layout {
         setGravity(Gravity.CENTER_HORIZONTAL);
         setOrientation(VERTICAL);
         setId(R.id.t_dialog__layout);
-        setFocusable(true);
-        setFocusableInTouchMode(true);
 
         mTopView.setId(R.id.t_dialog__top_view);
         mBottomView.setId(R.id.t_dialog__bottom_view);
@@ -162,7 +160,6 @@ class DialogLayout extends LinearLayout implements Layout {
             Animation inAnim = AnimationUtils.loadAnimation(context, mInAnimation);
             mContentContainer.startAnimation(inAnim);
         }
-        requestFocus();
     }
 
     /**
