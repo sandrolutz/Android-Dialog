@@ -38,8 +38,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mDialog != null) {
-                    //getWindow().setStatusBarColor(255);
-
                     // Create and show the dialog.
                     mDialog.show();
                 }
