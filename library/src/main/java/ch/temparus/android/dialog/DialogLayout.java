@@ -50,6 +50,17 @@ class DialogLayout extends Layout {
 
     DialogLayout(Dialog dialog, Dialog.Builder builder) {
         super(dialog, builder);
+
+        addOnLayoutChangeListener(new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                if (mState == Dialog.State.EXPANDED) {
+                    expandInternal(true);
+                } else {
+                    collapseInternal(true);
+                }
+            }
+        });
     }
 
     /**
