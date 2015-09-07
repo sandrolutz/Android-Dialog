@@ -1,19 +1,20 @@
 Change Log
 ==========
 
-## 1.2.0 SNAPSHOT (2015-08-02)
+## 1.2.0 SNAPSHOT (2015-08-07)
 
 **Enhancements:**
 
 - Add default header layout for displaying a title. 
 - Add method to Builder to add a title resource/CharSequence to display with the provided layout.
 - Add prefix ```t_dialog__``` to all resource ids to make them unique.
-- Add ```FULLSCREEN``` dialog as option beside of ```CENTER``` and ```BOTTOM```. 
-- Implement DialogFragment for internal use so the statusbar gets dimmed too.
+- Add ```FULLSCREEN``` dialog as option beside of ```CENTER``` and ```BOTTOM```.
+- System statusbar gets dimmed when background dim is enabled.
 
 **Bugfixes:**
 
 - Fix issue with background color of header/footer of ViewHolder.
+- Fix issue with OnClickListener applied to all children of a dialog removing the existing OnClickListeners.
 
 ## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
 

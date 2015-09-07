@@ -34,6 +34,7 @@ class DialogLayout extends Layout {
     private ViewGroup mHeaderContainer;
     private ViewGroup mFooterContainer;
     private int mCollapsedHeight;
+    private boolean mIsBackgroundDimEnabled;
     private boolean mIsFooterAlwaysVisible;
     private Dialog.State mState = Dialog.State.SETTLING;
     private Dialog.State mSettlingState = mState;
@@ -54,21 +55,23 @@ class DialogLayout extends Layout {
     /**
      * It adds the dialog view into rootView which is decorView of activity
      */
+    @SuppressLint("NewApi")
     public void show() {
         if (isShowing()) {
             return;
         }
         mDecorView.addView(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mPreviousStatusBarColor = ((Activity) getContext()).getWindow().getStatusBarColor();
+        if (mIsBackgroundDimEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = ((Activity) getContext()).getWindow();
+            mPreviousStatusBarColor = window.getStatusBarColor();
             int red = Color.red(mPreviousStatusBarColor);
             int green = Color.green(mPreviousStatusBarColor);
             int blue = Color.blue(mPreviousStatusBarColor);
             red = (int) Math.max(red - (red * DIM_FACTOR), 0);
             green = (int) Math.max(green - (green * DIM_FACTOR), 0);
             blue = (int) Math.max(blue - (blue * DIM_FACTOR), 0);
-            ((Activity) getContext()).getWindow().setStatusBarColor(Color.rgb(red, green, blue));
+            window.setStatusBarColor(Color.rgb(red, green, blue));
         }
 
         if (mCollapsedHeight != INVALID) {
@@ -102,9 +105,10 @@ class DialogLayout extends Layout {
             @Override
             public void onAnimationEnd(Animation animation) {
                 mDecorView.post(new Runnable() {
+                    @SuppressLint("NewApi")
                     @Override
                     public void run() {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (mIsBackgroundDimEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             ((Activity) getContext()).getWindow().setStatusBarColor(mPreviousStatusBarColor);
                         }
                         mDecorView.removeView(DialogLayout.this);
@@ -245,6 +249,7 @@ class DialogLayout extends Layout {
                 mOutAnimation = (builder.outAnimation == INVALID) ? R.anim.t_dialog__center_fade_out : builder.outAnimation;
         }
 
+        mIsBackgroundDimEnabled = builder.isBackgroundDimEnabled;
         mIsFooterAlwaysVisible = builder.isFooterAlwaysVisible;
         mCollapsedHeight = (mGravity != Dialog.Gravity.CENTER) ? builder.collapsedHeight : INVALID;
         mOnStateChangeListener = mHolder.getOnStateChangeListener();
@@ -293,7 +298,7 @@ class DialogLayout extends Layout {
         addView(mContentContainer, contentLayoutParams);
         addView(mBottomView, helperLayoutParams);
 
-        if (builder.isBackgroundDimEnabled) {
+        if (mIsBackgroundDimEnabled) {
             setBackgroundColor(DIM_COLOR);
         }
 

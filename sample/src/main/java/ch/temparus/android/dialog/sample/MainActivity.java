@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                                                     return true;
                                                 }
                                             })
+                                            .setBackgroundDimEnabled(false)
                                             .setTitle("Test-Title")
                                             .setHeader(R.layout.header)
                                             .setFooter(R.layout.footer);

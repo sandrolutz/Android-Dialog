@@ -13,6 +13,7 @@ import ch.temparus.android.dialog.holder.HolderAdapter;
 import ch.temparus.android.dialog.holder.ListViewHolder;
 import ch.temparus.android.dialog.holder.ViewHolder;
 import ch.temparus.android.dialog.listeners.*;
+import ch.temparus.android.dialog.utils.ViewUtils;
 
 /**
  * DialogLayout is used internally by {@link Dialog}
@@ -263,10 +264,14 @@ abstract class Layout extends LinearLayout {
         if (view instanceof AdapterView) {
             return;
         }
-
+        final View.OnClickListener oldListener = ViewUtils.getOnClickListener(view);
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (oldListener != null) {
+                    oldListener.onClick(v);
+                }
+
                 if (mOnClickListener == null) {
                     return;
                 }
