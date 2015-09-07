@@ -45,6 +45,9 @@ public class Dialog extends android.support.v4.app.DialogFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        if (mRootLayout != null) {
+            return (ViewGroup) mRootLayout;
+        }
         Builder builder = (Builder) getArguments().getSerializable(BUILDER);
         builder.context = getActivity();
         View view;
@@ -101,7 +104,7 @@ public class Dialog extends android.support.v4.app.DialogFragment {
      */
     @SuppressWarnings("unused")
     public boolean isShowing() {
-        return isVisible() && !mFirst;
+        return isAdded() && !mFirst;
     }
 
     /**

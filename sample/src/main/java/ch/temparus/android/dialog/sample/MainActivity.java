@@ -1,6 +1,8 @@
 package ch.temparus.android.dialog.sample;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -19,6 +21,8 @@ import ch.temparus.android.dialog.listeners.OnItemClickListener;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Dialog mDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +34,28 @@ public class MainActivity extends AppCompatActivity {
         final RadioGroup typeGroup = (RadioGroup) findViewById(R.id.type_group);
         gravityGroup.check(R.id.gravity_bottom);
         typeGroup.check(R.id.type_list);
-        
+
+        Button repeatButton = (Button) findViewById(R.id.button_repeat);
+        repeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mDialog != null) {
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+                    if (prev != null) {
+                        ft.remove(prev);
+                    }
+                    ft.addToBackStack(null);
+                    ft.commit();
+                    getWindow().setStatusBarColor(255);
+
+                    // Create and show the dialog.
+                    mDialog.show(ft, "dialog");
+                    //mDialog.show(getSupportFragmentManager(), "dialog");
+                }
+            }
+        });
+
         Button showButton = (Button) findViewById(R.id.button_show);
         showButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if (typeButtonId == R.id.type_list) {
                     builder.setContentHolder(new ListViewHolder(new SampleListAdapter(MainActivity.this)));
-                    builder.setCollapsedHeight(getResources().getDimensionPixelSize(R.dimen.dialog_collapsed_height));
                     builder.setOnItemClickListener(new OnItemClickListener() {
                         @Override
                         public void onItemClick(Dialog dialog, Object item, View view, int position) {
@@ -91,8 +115,8 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
 
-                Dialog dialog = builder.create();
-                dialog.show(getSupportFragmentManager(), "dialog");
+                mDialog = builder.create();
+                mDialog.show(getSupportFragmentManager(), "dialog");
             }
         });
     }

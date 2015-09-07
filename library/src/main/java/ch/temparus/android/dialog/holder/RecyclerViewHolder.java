@@ -98,6 +98,13 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
     @Override
     public View getView(LayoutInflater inflater, ViewGroup parent) {
         int backgroundColor = parent.getResources().getColor(mBackgroundColorResource);
+        if (mRecyclerView != null) {
+            ViewGroup parentView = (ViewGroup) mRecyclerView.getParent();
+            if (parentView.getParent() != null) {
+                ((ViewGroup) parentView.getParent()).removeView(parentView);
+            }
+            return parentView;
+        }
         View view = inflater.inflate(R.layout.t_dialog__holder_recycler_view, parent, false);
         view.setId(R.id.t_dialog__content_view);
         mRecyclerView = (AdvancedRecyclerView) view.findViewById(R.id.t_dialog__holder_recycler_view);
