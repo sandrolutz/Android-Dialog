@@ -1,8 +1,6 @@
 package ch.temparus.android.dialog.sample;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -40,18 +38,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mDialog != null) {
-                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                    Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
-                    if (prev != null) {
-                        ft.remove(prev);
-                    }
-                    ft.addToBackStack(null);
-                    ft.commit();
-                    getWindow().setStatusBarColor(255);
+                    //getWindow().setStatusBarColor(255);
 
                     // Create and show the dialog.
-                    mDialog.show(ft, "dialog");
-                    //mDialog.show(getSupportFragmentManager(), "dialog");
+                    mDialog.show();
                 }
             }
         });
@@ -116,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 mDialog = builder.create();
-                mDialog.show(getSupportFragmentManager(), "dialog");
+                mDialog.show();
             }
         });
     }
