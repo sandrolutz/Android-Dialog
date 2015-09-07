@@ -1,6 +1,7 @@
 package ch.temparus.android.dialog.holder;
 
 import android.support.annotation.ColorRes;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ public class ViewHolder implements Holder {
 
     private ViewGroup mHeaderContainer;
     private ViewGroup mFooterContainer;
+    private View.OnKeyListener mKeyListener;
 
     private View mContentView;
     private int mViewResourceId = INVALID;
@@ -70,6 +72,15 @@ public class ViewHolder implements Holder {
         int backgroundColor = parent.getResources().getColor(mBackgroundColor);
         ViewGroup contentContainer = (ViewGroup) view.findViewById(R.id.view_container);
         contentContainer.setBackgroundColor(backgroundColor);
+        contentContainer.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (mKeyListener == null) {
+                    throw new NullPointerException("OnKeyListener should not be null");
+                }
+                return mKeyListener.onKey(v, keyCode, event);
+            }
+        });
         addContent(inflater, parent, contentContainer);
         mHeaderContainer = (ViewGroup) view.findViewById(R.id.t_dialog__header_container);
         mHeaderContainer.setBackgroundColor(backgroundColor);
@@ -98,6 +109,11 @@ public class ViewHolder implements Holder {
     @Override
     public boolean isInterceptTouchEventDisallowed() {
         return true;
+    }
+
+    @Override
+    public void setOnKeyListener(View.OnKeyListener keyListener) {
+        mKeyListener = keyListener;
     }
 
     @Override

@@ -1,21 +1,22 @@
 package ch.temparus.android.dialog;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.*;
-import ch.temparus.android.dialog.holder.Holder;
-import ch.temparus.android.dialog.holder.HolderAdapter;
-import ch.temparus.android.dialog.holder.ListViewHolder;
-import ch.temparus.android.dialog.holder.ViewHolder;
-import ch.temparus.android.dialog.listeners.*;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.Scroller;
+import android.widget.TextView;
+import ch.temparus.android.dialog.listeners.OnStateChangeListener;
 
 /**
  * DialogLayout is used internally by {@link Dialog}
@@ -23,37 +24,20 @@ import ch.temparus.android.dialog.listeners.*;
  * @author Sandro Lutz
  */
 @SuppressLint("ViewConstructor")
-class DialogLayout extends LinearLayout implements Layout {
+class DialogLayout extends Layout {
 
-    // Determine whether the resources are set or not
-    private static final int INVALID = -1;
-
-    private final int[] mMargin = new int[4];
-    private final int[] mPadding = new int[4];
+    private static final int DIM_COLOR = 0x66000000;
+    private static final float DIM_FACTOR = 0.4f;
+    
     private View mTopView;
     private View mBottomView;
-    private View mHeaderView;
-    private View mFooterView;
     private ViewGroup mHeaderContainer;
     private ViewGroup mFooterContainer;
-    private BoundedFrameLayout mContentContainer;
     private int mCollapsedHeight;
-    private int mBackgroundColorResourceId;
-    private int mInAnimation;
-    private int mOutAnimation;
-    private Dialog.Gravity mGravity;
-    private Holder mHolder; // Content
     private boolean mIsFooterAlwaysVisible;
-    private boolean mIsCancelable;
     private Dialog.State mState = Dialog.State.SETTLING;
     private Dialog.State mSettlingState = mState;
-    private boolean mIsDismissing;
     private float mMaxScroll = INVALID;
-    private Dialog mDialog;
-    private OnItemClickListener mOnItemClickListener;
-    private ch.temparus.android.dialog.listeners.OnClickListener mOnClickListener;
-    private OnDismissListener mOnDismissListener;
-    private OnCancelListener mOnCancelListener;
     private OnStateChangeListener mOnStateChangeListener;
     private int mTouchSlop;
     private int mActivePointerId = INVALID;
@@ -61,85 +45,10 @@ class DialogLayout extends LinearLayout implements Layout {
     private float mInitialMotionY; // position on action down motion event
     private float mLastMotionDeltaY;
     private Scroller mScroller; // calculates smooth scroll animation
+    private int mPreviousStatusBarColor;
 
     DialogLayout(Dialog dialog, Dialog.Builder builder) {
-        super(dialog.getActivity());
-
-        final Resources res = getResources();
-
-        LinearLayout.LayoutParams helperLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
-        FrameLayout.LayoutParams contentLayoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        mDialog = dialog;
-
-        mHolder = (builder.holder == null) ? new ListViewHolder() : builder.holder;
-        mHeaderView = builder.headerView;
-        mFooterView = builder.footerView;
-
-        mIsFooterAlwaysVisible = builder.isFooterAlwaysVisible;
-        mIsCancelable = builder.isCancelable;
-        mGravity = builder.gravity;
-        mCollapsedHeight = (mGravity != Dialog.Gravity.CENTER) ? builder.collapsedHeight : INVALID;
-        mBackgroundColorResourceId = builder.backgroundColorResourceId;
-
-        mInAnimation = (builder.inAnimation == INVALID) ? getInAnimation(mGravity) : builder.inAnimation;
-        mOutAnimation = (builder.outAnimation == INVALID) ? getOutAnimation(mGravity) : builder.outAnimation;
-
-        System.arraycopy(builder.padding, 0, mPadding, 0, mPadding.length);
-
-        mOnItemClickListener = builder.onItemClickListener;
-        mOnClickListener = builder.onClickListener;
-        mOnDismissListener = builder.onDismissListener;
-        mOnCancelListener = builder.onCancelListener;
-        mOnStateChangeListener = mHolder.getOnStateChangeListener();
-
-        int minimumMargin = res.getDimensionPixelSize(R.dimen.t_dialog__min_margin);
-        for (int i = 0; i < mMargin.length; i++) {
-            mMargin[i] = getMargin(mGravity, builder.margin[i], minimumMargin);
-        }
-
-        mTopView = new View(builder.context);
-        mContentContainer = new BoundedFrameLayout(builder.context);
-        mBottomView = new View(builder.context);
-
-        // set maximum dialog width depending on gravity
-        switch (mGravity) {
-            case BOTTOM:
-                mContentContainer.setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.t_dialog__max_width_bottom));
-                break;
-            case CENTER:
-                mContentContainer.setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.t_dialog__max_width_center));
-                break;
-        }
-        mContentContainer.setBoundedHeight(builder.maxHeight); // if INVALID, it will be ignored
-
-        initContentView();
-        initPosition();
-        initCancelable();
-
-        if (mHeaderView == null && builder.title != null && builder.title.length() > 0) {
-            mHeaderView = LayoutInflater.from(builder.context).inflate(R.layout.t_dialog__header, mHeaderContainer, false);
-            ((TextView) mHeaderView.findViewById(R.id.t_dialog__title)).setText(builder.title);
-            mHolder.addHeader(mHeaderView);
-        }
-
-        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        setGravity(Gravity.CENTER_HORIZONTAL);
-        setOrientation(VERTICAL);
-        setId(R.id.t_dialog__layout);
-
-        mTopView.setId(R.id.t_dialog__top_view);
-        mBottomView.setId(R.id.t_dialog__bottom_view);
-        mContentContainer.setId(R.id.t_dialog__content_container);
-
-        addView(mTopView, helperLayoutParams);
-        addView(mContentContainer, contentLayoutParams);
-        addView(mBottomView, helperLayoutParams);
-
-        final ViewConfiguration configuration = ViewConfiguration.get(getContext());
-        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
-
-        mScroller = new Scroller(builder.context);
+        super(dialog, builder);
     }
 
     /**
@@ -148,6 +57,18 @@ class DialogLayout extends LinearLayout implements Layout {
     public void show() {
         if (isShowing()) {
             return;
+        }
+        mDecorView.addView(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mPreviousStatusBarColor = ((Activity) getContext()).getWindow().getStatusBarColor();
+            int red = Color.red(mPreviousStatusBarColor);
+            int green = Color.green(mPreviousStatusBarColor);
+            int blue = Color.blue(mPreviousStatusBarColor);
+            red = (int) Math.max(red - (red * DIM_FACTOR), 0);
+            green = (int) Math.max(green - (green * DIM_FACTOR), 0);
+            blue = (int) Math.max(blue - (blue * DIM_FACTOR), 0);
+            ((Activity) getContext()).getWindow().setStatusBarColor(Color.rgb(red, green, blue));
         }
 
         if (mCollapsedHeight != INVALID) {
@@ -160,15 +81,7 @@ class DialogLayout extends LinearLayout implements Layout {
             Animation inAnim = AnimationUtils.loadAnimation(context, mInAnimation);
             mContentContainer.startAnimation(inAnim);
         }
-    }
-
-    /**
-     * It basically check if the rootView contains the dialog view.
-     *
-     * @return true if the dialog is visible
-     */
-    public boolean isShowing() {
-        return mDialog.isShowing();
+        mContentContainer.requestFocus();
     }
 
     /**
@@ -178,42 +91,38 @@ class DialogLayout extends LinearLayout implements Layout {
         if (mIsDismissing) {
             return;
         }
-        if (mOutAnimation != INVALID) {
-            Context context = getContext();
-            Animation outAnim = AnimationUtils.loadAnimation(context, mOutAnimation);
-            outAnim.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
+        Context context = getContext();
+        Animation outAnim = AnimationUtils.loadAnimation(context, mOutAnimation);
+        outAnim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
 
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    mIsDismissing = false;
-                    if (mOnDismissListener != null) {
-                        mOnDismissListener.onDismiss(mDialog);
-                    }
-                    post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDialog.dismissInternal();
-                        }
-                    });
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-            mContentContainer.startAnimation(outAnim);
-            mIsDismissing = true;
-        } else {
-            if (mOnDismissListener != null) {
-                mOnDismissListener.onDismiss(mDialog);
             }
-            mDialog.dismissInternal();
-        }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mDecorView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            ((Activity) getContext()).getWindow().setStatusBarColor(mPreviousStatusBarColor);
+                        }
+                        mDecorView.removeView(DialogLayout.this);
+                        mIsDismissing = false;
+                        if (mOnDismissListener != null) {
+                            mOnDismissListener.onDismiss(mDialog);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        mContentContainer.startAnimation(outAnim);
+        mIsDismissing = true;
     }
 
     public View getHeaderView() {
@@ -285,28 +194,6 @@ class DialogLayout extends LinearLayout implements Layout {
         mScroller.forceFinished(true);
     }
 
-    private int getInAnimation(Dialog.Gravity gravity) {
-        switch (gravity) {
-            case BOTTOM:
-                return R.anim.t_dialog__bottom_slide_in;
-            case CENTER:
-                return R.anim.t_dialog__center_fade_in;
-            default:
-                return INVALID;
-        }
-    }
-
-    private int getOutAnimation(Dialog.Gravity gravity) {
-        switch (gravity) {
-            case BOTTOM:
-                return R.anim.t_dialog__bottom_slide_out;
-            case CENTER:
-                return R.anim.t_dialog__center_fade_out;
-            default:
-                return INVALID;
-        }
-    }
-
     /**
      * It is called to set whether the dialog is cancellable by pressing back button or
      * touching the black overlay
@@ -344,122 +231,76 @@ class DialogLayout extends LinearLayout implements Layout {
         }
     }
 
-    private void initContentView() {
-        int convertedGravity = getGravity();
-        View contentView = createView(LayoutInflater.from(getContext()));
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, convertedGravity
-        );
-        params.setMargins(mMargin[0], mMargin[1], mMargin[2], mMargin[3]);
-        contentView.setLayoutParams(params);
-        getHolderView().setPadding(mPadding[0], mPadding[1], mPadding[2], mPadding[3]);
+    @Override
+    protected void initContentView(Dialog.Builder builder) {
+        final Resources res = getResources();
 
-        mContentContainer.addView(contentView);
-        mHeaderContainer = (ViewGroup) mContentContainer.findViewById(R.id.t_dialog__header_container);
-        mFooterContainer = (ViewGroup) mContentContainer.findViewById(R.id.t_dialog__footer_container);
-    }
-
-    /**
-     * it is called when the content view is created
-     *
-     * @param inflater used to inflate the content of the dialog
-     * @return content view
-     */
-    private View createView(LayoutInflater inflater) {
-        mHolder.setBackgroundColor(mBackgroundColorResourceId);
-        View view = mHolder.getView(inflater, this);
-
-        if (mHolder instanceof ViewHolder) {
-            assignClickListenerRecursively(view);
-        }
-
-        mContentContainer.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        });
-
-        assignClickListenerRecursively(mHeaderView);
-        mHolder.addHeader(mHeaderView);
-
-        assignClickListenerRecursively(mFooterView);
-        mHolder.addFooter(mFooterView);
-
-        if (mHolder instanceof HolderAdapter) {
-            ((HolderAdapter) mHolder).setOnItemClickListener(new OnHolderListener() {
-                @Override
-                public void onItemClick(Object item, View view, int position) {
-                    if (mOnItemClickListener == null) {
-                        return;
-                    }
-                    mOnItemClickListener.onItemClick(mDialog, item, view, position);
-                }
-            });
-        }
-        return view;
-    }
-
-    /**
-     * Loop among the views in the hierarchy and assign listener to them
-     */
-    private void assignClickListenerRecursively(View parent) {
-        if (parent == null) {
-            return;
-        }
-
-        if (parent instanceof ViewGroup) {
-            ViewGroup viewGroup = (ViewGroup) parent;
-            int childCount = viewGroup.getChildCount();
-            for (int i = childCount - 1; i >= 0; i--) {
-                View child = viewGroup.getChildAt(i);
-                assignClickListenerRecursively(child);
-            }
-        }
-        setClickListener(parent);
-    }
-
-    /**
-     * It is used to set a click listener on view that have a valid id associated
-     */
-    private void setClickListener(final View view) {
-        if (view.getId() == INVALID) {
-            return;
-        }
-        // AdapterView does not support click listener
-        if (view instanceof AdapterView) {
-            return;
-        }
-
-        view.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnClickListener == null) {
-                    return;
-                }
-                mOnClickListener.onClick(mDialog, view);
-            }
-        });
-    }
-
-    private int getMargin(Dialog.Gravity gravity, int margin, int minimumMargin) {
-        switch (gravity) {
+        switch (builder.gravity) {
             case BOTTOM:
-                return (margin == INVALID) ? 0 : margin;
-            case CENTER:
-                return (margin == INVALID) ? minimumMargin : margin;
-            default:
-                return 0;
+                mInAnimation = (builder.inAnimation == INVALID) ? R.anim.t_dialog__bottom_slide_in : builder.inAnimation;
+                mOutAnimation = (builder.outAnimation == INVALID) ? R.anim.t_dialog__bottom_slide_out : builder.outAnimation;
+                break;
+            default: // CENTER
+                mInAnimation = (builder.inAnimation == INVALID) ? R.anim.t_dialog__center_fade_in : builder.inAnimation;
+                mOutAnimation = (builder.outAnimation == INVALID) ? R.anim.t_dialog__center_fade_out : builder.outAnimation;
         }
-    }
 
-    private int getGravity() {
+        mIsFooterAlwaysVisible = builder.isFooterAlwaysVisible;
+        mCollapsedHeight = (mGravity != Dialog.Gravity.CENTER) ? builder.collapsedHeight : INVALID;
+        mOnStateChangeListener = mHolder.getOnStateChangeListener();
+
+        LinearLayout.LayoutParams helperLayoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
+        FrameLayout.LayoutParams contentLayoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        mTopView = new View(builder.context);
+        mContentContainer = new BoundedFrameLayout(builder.context);
+        mBottomView = new View(builder.context);
+
+        // set maximum dialog width depending on gravity
         switch (mGravity) {
             case BOTTOM:
-                return Gravity.BOTTOM;
-            default:
-                return Gravity.CENTER;
+                ((BoundedFrameLayout) mContentContainer).setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.t_dialog__max_width_bottom));
+                break;
+            case CENTER:
+                ((BoundedFrameLayout) mContentContainer).setBoundedWidth((builder.maxWidth != INVALID) ? builder.maxWidth : res.getDimensionPixelSize(R.dimen.t_dialog__max_width_center));
+                break;
         }
+        ((BoundedFrameLayout) mContentContainer).setBoundedHeight(builder.maxHeight); // if INVALID, it will be ignored
+
+        super.initContentView(builder);
+        initPosition();
+        initCancelable();
+
+        mHeaderContainer = (ViewGroup) mContentContainer.findViewById(R.id.t_dialog__header_container);
+        mFooterContainer = (ViewGroup) mContentContainer.findViewById(R.id.t_dialog__footer_container);
+
+        if (mHeaderView == null && builder.title != null && builder.title.length() > 0) {
+            mHeaderView = LayoutInflater.from(builder.context).inflate(R.layout.t_dialog__header, mHeaderContainer, false);
+            ((TextView) mHeaderView.findViewById(R.id.t_dialog__title)).setText(builder.title);
+            mHolder.addHeader(mHeaderView);
+        }
+
+        setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setGravity(Gravity.CENTER_HORIZONTAL);
+        setOrientation(VERTICAL);
+        setId(R.id.t_dialog__layout);
+
+        mTopView.setId(R.id.t_dialog__top_view);
+        mBottomView.setId(R.id.t_dialog__bottom_view);
+        mContentContainer.setId(R.id.t_dialog__content_container);
+
+        addView(mTopView, helperLayoutParams);
+        addView(mContentContainer, contentLayoutParams);
+        addView(mBottomView, helperLayoutParams);
+
+        if (builder.isBackgroundDimEnabled) {
+            setBackgroundColor(DIM_COLOR);
+        }
+
+        final ViewConfiguration configuration = ViewConfiguration.get(getContext());
+        mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
+
+        mScroller = new Scroller(builder.context);
     }
 
     private void setState(Dialog.State state) {
@@ -768,14 +609,5 @@ class DialogLayout extends LinearLayout implements Layout {
                 expandInternal(true);
             }
         }
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-            cancel();
-            return true;
-        }
-        return super.dispatchKeyEvent(event);
     }
 }

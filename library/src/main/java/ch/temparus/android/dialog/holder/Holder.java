@@ -56,6 +56,13 @@ public interface Holder extends Serializable {
     boolean isInterceptTouchEventDisallowed();
 
     /**
+     * Set OnKeyListener.
+     * Called by {@link ch.temparus.android.dialog.Layout} to catch key events for back button.
+     * @param keyListener OnKeyListener
+     */
+    void setOnKeyListener(View.OnKeyListener keyListener);
+
+    /**
      * Get {@link OnStateChangeListener} to catch state changes of {@link ch.temparus.android.dialog.Dialog}.
      * Called by {@link ch.temparus.android.dialog.DialogLayout}
      * @return OnStateChangeListener

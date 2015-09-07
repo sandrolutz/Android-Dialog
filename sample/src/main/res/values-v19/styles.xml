@@ -6,6 +6,8 @@
         <item name="colorPrimaryDark">#0288D1</item>
         <item name="colorAccent">#40C4FF</item>
         <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:fitsSystemWindows">false</item>
     </style>
 
 </resources>

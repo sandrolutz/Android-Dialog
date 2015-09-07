@@ -27,6 +27,7 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
     private RecyclerView.LayoutManager mLayoutManager;
     private BaseAdapter mAdapter;
     private OnHolderListener mHolderListener;
+    private View.OnKeyListener mKeyListener;
     private Dialog.State mState;
     private long mLastStateChange;
     private int mBackgroundColorResource;
@@ -163,6 +164,15 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
                 mIsInterceptTouchEventDisallowed = (top < 0 && mState == Dialog.State.EXPANDED);
             }
         });
+        mRecyclerView.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (mKeyListener == null) {
+                    throw new NullPointerException("keyListener should not be null");
+                }
+                return mKeyListener.onKey(v, keyCode, event);
+            }
+        });
         mHeaderContainer = (FrameLayout) view.findViewById(R.id.t_dialog__header_container);
         mHeaderContainer.setBackgroundColor(backgroundColor);
         mHeaderContainer.setOnTouchListener(new View.OnTouchListener() {
@@ -195,6 +205,11 @@ public class RecyclerViewHolder implements HolderAdapter<BaseAdapter> {
     @Override
     public boolean isInterceptTouchEventDisallowed() {
         return mIsInterceptTouchEventDisallowed;
+    }
+
+    @Override
+    public void setOnKeyListener(View.OnKeyListener keyListener) {
+        mKeyListener = keyListener;
     }
 
     @Override
