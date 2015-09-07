@@ -238,7 +238,7 @@ abstract class Layout extends LinearLayout {
      * Loop among the views in the hierarchy and assign listener to them
      */
     private void assignClickListenerRecursively(View parent) {
-        if (parent == null) {
+        if (parent == null || mOnClickListener == null) {
             return;
         }
 
