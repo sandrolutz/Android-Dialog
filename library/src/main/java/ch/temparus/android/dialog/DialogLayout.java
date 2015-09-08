@@ -76,13 +76,17 @@ class DialogLayout extends Layout {
         if (mIsBackgroundDimEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = ((Activity) getContext()).getWindow();
             mPreviousStatusBarColor = window.getStatusBarColor();
-            int red = Color.red(mPreviousStatusBarColor);
-            int green = Color.green(mPreviousStatusBarColor);
-            int blue = Color.blue(mPreviousStatusBarColor);
-            red = (int) Math.max(red - (red * DIM_FACTOR), 0);
-            green = (int) Math.max(green - (green * DIM_FACTOR), 0);
-            blue = (int) Math.max(blue - (blue * DIM_FACTOR), 0);
-            window.setStatusBarColor(Color.rgb(red, green, blue));
+            if (Color.alpha(mPreviousStatusBarColor) == 0) {
+                window.setStatusBarColor(DIM_COLOR);
+            } else {
+                int red = Color.red(mPreviousStatusBarColor);
+                int green = Color.green(mPreviousStatusBarColor);
+                int blue = Color.blue(mPreviousStatusBarColor);
+                red = (int) Math.max(red - (red * DIM_FACTOR), 0);
+                green = (int) Math.max(green - (green * DIM_FACTOR), 0);
+                blue = (int) Math.max(blue - (blue * DIM_FACTOR), 0);
+                window.setStatusBarColor(Color.rgb(red, green, blue));
+            }
         }
 
         if (mCollapsedHeight != INVALID) {
