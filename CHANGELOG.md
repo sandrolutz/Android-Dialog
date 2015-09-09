@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
+## [1.1.1](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
 
 **Bugfixes:**
 
