@@ -16,7 +16,7 @@ Change Log
 - Fix issue with background color of header/footer of ViewHolder.
 - Fix issue with OnClickListener applied to all children of a dialog removing the existing OnClickListeners.
 
-## [1.1.0](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
+## [1.1.1](https://github.com/sandrolutz/Android-Dialog/tree/1.1.1) (2015-07-29)
 
 **Bugfixes:**
 
